@@ -69,3 +69,6 @@ appsettings.Local.
 
 # Visual Studio
 .vs/
+
+# Environment file
+.env

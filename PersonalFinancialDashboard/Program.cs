@@ -57,6 +57,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 
+var dbServer = Environment.GetEnvironmentVariable("DB_SERVER") ;
+var dbName = Environment.GetEnvironmentVariable("DB_NAME") ;
+var dbUser = Environment.GetEnvironmentVariable("DB_USER");
+var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
+
+var connectionString = $"Server={dbServer};Database={dbName};User Id={dbUser};Password={dbPassword};TrustServerCertificate=True;";
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(connectionString));
 
 
 // Add services to the container.
@@ -72,8 +80,7 @@ builder.Services.AddScoped<IDasboardService, DashboardServiceImpl>();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 
 var app = builder.Build();
 

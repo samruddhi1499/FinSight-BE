@@ -45,7 +45,7 @@ namespace PersonalFinancialDashboard.Entities
                 entity.Property(e => e.Username).HasColumnName("username");
                 entity.Property(e => e.PasswordHash)
                     .HasColumnName("password_hash");
-               
+
             });
             modelBuilder.Entity<UserDetails>(entity =>
             {
