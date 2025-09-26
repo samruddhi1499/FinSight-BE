@@ -1,9 +1,10 @@
-using Microsoft.EntityFrameworkCore;
-using PersonalFinancialDashboard.Entities;
-using Scalar.AspNetCore;
-
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using PersonalFinancialDashboard.Entities;
+using PersonalFinancialDashboard.Services;
+using PersonalFinancialDashboard.Services.Interface;
+using Scalar.AspNetCore;
 using System.Text;
 
 
@@ -61,6 +62,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 // Add services to the container.
 
 builder.Services.AddControllers();
+// In Program.cs
+builder.Services.AddScoped<IExpenseService, ExpenseServiceImpl>();
+builder.Services.AddScoped<IAuthService, AuthServiceImpl>();
+builder.Services.AddScoped<IUserDetailsService, UserDetailsServiceImpl>();
+builder.Services.AddScoped<IRecurringCategoriesService, RecurringCategoriesServiceImpl>();
+builder.Services.AddScoped<IDasboardService, DashboardServiceImpl>();
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 

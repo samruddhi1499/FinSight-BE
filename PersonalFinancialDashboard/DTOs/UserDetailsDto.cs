@@ -1,6 +1,6 @@
 ﻿using PersonalFinancialDashboard.Entities;
 
-namespace PersonalFinancialDashboard.Models
+namespace PersonalFinancialDashboard.DTOs
 {
     public class UserDetailsDto
     {

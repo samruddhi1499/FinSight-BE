@@ -1,14 +1,10 @@
-﻿using Azure.Core;
+﻿
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using PersonalFinancialDashboard.Entities;
-using PersonalFinancialDashboard.Models;
-using System.IdentityModel.Tokens.Jwt;
+using PersonalFinancialDashboard.DTOs;
+using PersonalFinancialDashboard.Services.Interface;
 using System.Security.Claims;
-using System.Text;
+
 
 namespace PersonalFinancialDashboard.Controllers
 {
@@ -17,103 +13,90 @@ namespace PersonalFinancialDashboard.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IConfiguration _configuration;
-        private readonly AppDbContext _context;
+        private readonly IAuthService _authService;
 
-        public AuthController(IConfiguration configuration, AppDbContext context)
+        public AuthController(IConfiguration configuration, IAuthService authService)
         {
             _configuration = configuration;
-            _context = context;
+            _authService = authService;
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<User>> Register(UserDtos request)
+        public async Task<ActionResult> Register(UserDtos request)
         {
-            if (await _context.Users.AnyAsync(u => u.Username == request.Username))
+            string result = await _authService.RegisterUser(request);
+            if (result == "Created")
             {
-                return BadRequest("Username already exists");
+                return Ok(result);
             }
 
-            var user = new User { Username = request.Username };
-            var passwordHasher = new PasswordHasher<User>();
-            user.PasswordHash = passwordHasher.HashPassword(user, request.Password);
-
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            return Ok(user);
+            return BadRequest(result);
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UserDtos request)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == request.Username);
-            if (user == null) return BadRequest(new { error = "User does not exist" });
+            LoginDto result = await _authService.Login(request);
 
-            var passwordHasher = new PasswordHasher<User>();
-            var result = passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
-            if (result == PasswordVerificationResult.Failed) return BadRequest(new { error = "Wrong Password" });
-
-            string token = CreateToken(user); // Your token creation logic here
-
-            var cookieOptions = new CookieOptions
+            if(result.Message == "Login Success")
             {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.None,   // Or None if HTTPS and cross-origin local dev
-                Expires = DateTime.UtcNow.AddHours(1),
-                Path = "/"
-            };
+                Response.Cookies.Append("jwt_token", result.Token, result.CookieOptions);
+                if (!result.IsOnboarded)
+                {
+                    Response.Cookies.Append("onboarding_required", "true", result.CookieOptions);
+                }
+                else
+                {
+                    Response.Cookies.Delete("onboarding_required");
+                }
 
-            Response.Cookies.Append("jwt_token", token, cookieOptions);
+                return Ok(new { result.Message, result.IsOnboarded });
+            }
 
-            return Ok(new { message = "Logged in successfully" });
+            return BadRequest(new { result.Message, result.IsOnboarded });
         }
 
         [Authorize]
         [HttpPost("change-password")]
-        public async Task<IActionResult> ChangePassowrd([FromBody] ChangePasswordDto password)
+        public async Task<IActionResult> ChangePassowrd([FromBody] ChangePasswordDto request)
         {
             string username = User.FindFirstValue(ClaimTypes.Name);
-            var user = await _context.Users.SingleOrDefaultAsync(u => u.Username == username);
-            if (user == null) return BadRequest(new { error = "User does not exist" });
+            string result = await _authService.ChangePassword(request, username);
+            if(result == "Success")
+            {
+                return Ok(result);
+            }
+            return BadRequest(result);
 
-            var passwordHasher = new PasswordHasher<User>();
-            var result = passwordHasher.VerifyHashedPassword(user, user.PasswordHash, password.CurrentPassword);
-            if (result == PasswordVerificationResult.Failed) return BadRequest(new { error = "Wrong Password" });
-
-            string token = CreateToken(user); // Your token creation logic here
-
-           
-        
-            user.PasswordHash = passwordHasher.HashPassword(user, password.NewPassword);
-
-           
-            await _context.SaveChangesAsync();
-
-            return Ok(new { message = "Password Changed successfully" });
         }
 
 
-        private string CreateToken(User user)
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
         {
-            var claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.Name, user.Username),
-        // add other claims if needed
-    };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["AppSettings:Token"]));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var token = new JwtSecurityToken(
-                issuer: _configuration["AppSettings:Issuer"],
-                audience: _configuration["AppSettings:Audience"],
-                claims: claims,
-                expires: DateTime.UtcNow.AddHours(1),
-                signingCredentials: creds);
+            Response.Cookies.Append(
+                "jwt_token",
+               "", // Set an empty value
+               new CookieOptions()
+               {
+                   Expires = DateTimeOffset.UtcNow.AddDays(-1), // Set an expired date in the past
+                   HttpOnly = true, // Important: Maintain HttpOnly flag if it was set on the original cookie
+                   Secure = true, // Set to true if the original cookie was secure (HTTPS)
+                   SameSite = SameSiteMode.None, // Adjust SameSite mode as needed, matching the original cookie
+                   Path = "/" // Important: Match the path of the original cookie
+                              // You may also need to set the Domain property if the original cookie had one
+               }
+           );
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
+            return Ok("");
+         }
+
+
+
+        
+        
 
     }
 }

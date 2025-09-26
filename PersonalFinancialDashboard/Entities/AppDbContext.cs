@@ -20,6 +20,10 @@ namespace PersonalFinancialDashboard.Entities
 
         public DbSet<ExpenseCategories> ExpenseCategories { get; set; }
 
+        public DbSet<Expense> Expenses { get; set; }
+
+        public DbSet<MarkComplete> MarkCompletes { get; set; }
+
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -63,13 +67,45 @@ namespace PersonalFinancialDashboard.Entities
 
                 entity.Property(e => e.ExpenseCategoriesId).HasColumnName("ex_category_id");
                 entity.Property(e => e.UserId).HasColumnName("userId");
+                entity.Property(e => e.CapAmount).HasColumnName("CapAmount");
 
                 // Composite primary key
                 entity.HasKey(e => new { e.ExpenseCategoriesId, e.UserId });
             });
+            modelBuilder.Entity<Expense>(entity =>
+            {
+                entity.ToTable("Expenses");
 
-               
-                
+                entity.Property(e => e.Id)
+                      .ValueGeneratedOnAdd()
+                      .HasColumnName("Id");
+                entity.Property(e => e.Amount).HasColumnName("Amount");
+                entity.Property(e => e.ExpenseCategoriesId)
+                    .HasColumnName("ExpenseCategoryId");
+                entity.Property(e => e.UserId)
+                    .HasColumnName("UserId");
+                entity.Property(e => e.ExpenseDate)
+                    .HasColumnName("ExpenseDate");
+
+            });
+
+            modelBuilder.Entity<MarkComplete>(entity =>
+            {
+                entity.ToTable("MarkComplete");
+
+                entity.Property(e => e.Month).HasColumnName("expense_month");
+                entity.Property(e => e.Year).HasColumnName("expense_year");
+                entity.Property(e => e.UserId)
+                   .HasColumnName("userId");
+                entity.Property(e => e.Savings)
+                   .HasColumnName("savings");
+
+                // Composite primary key
+                entity.HasKey(e => new { e.Month, e.Year });
+            });
+
+
+
 
             OnModelCreatingPartial(modelBuilder);
         }

@@ -1,4 +1,4 @@
-﻿namespace PersonalFinancialDashboard.Models
+﻿namespace PersonalFinancialDashboard.DTOs
 {
     public class ChangePasswordDto
     {
