@@ -20,9 +20,12 @@ WORKDIR /app
 # Copy published output from build
 COPY --from=build /app/publish .
 
-# Expose ports
+# Expose required ports
 EXPOSE 80
 EXPOSE 443
+
+# Ensure app listens on dynamic port assigned by Render
+ENV ASPNETCORE_URLS=http://*:${PORT}
 
 # Run the app
 ENTRYPOINT ["dotnet", "PersonalFinancialDashboard.dll"]
