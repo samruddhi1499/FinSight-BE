@@ -6,25 +6,39 @@ using PersonalFinancialDashboard.Services;
 using PersonalFinancialDashboard.Services.Interface;
 using Scalar.AspNetCore;
 using System.Text;
-
-
-
+using DotNetEnv;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// CORS Policy to allow frontend calls with credentials
+// Load .env file
+Env.Load();
+
+// Read MySQL credentials from .env
+var dbServer = Environment.GetEnvironmentVariable("DB_SERVER");
+var dbName = Environment.GetEnvironmentVariable("DB_NAME");
+var dbUser = Environment.GetEnvironmentVariable("DB_USER");
+var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
+
+// Build MySQL connection string
+var connectionString = $"Server={dbServer};Port=3306;Database={dbName};User={dbUser};Password={dbPassword};SslMode=None;";
+
+// Add DbContext with MySQL
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+
+// CORS Policy
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowLocalhost3000", policy =>
     {
-        policy.WithOrigins("http://localhost:3000")  // Exact frontend URL
+        policy.WithOrigins("http://localhost:3000")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
     });
 });
 
-// JWT Authentication reading token from the cookie
+// JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -52,50 +66,23 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidIssuer = builder.Configuration["AppSettings:Issuer"],
             ValidAudience = builder.Configuration["AppSettings:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(
-               Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:Token"]))
+                Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:Token"]))
         };
     });
 
-
-//var dbServer = Environment.GetEnvironmentVariable("DB_SERVER") ;
-//var dbName = Environment.GetEnvironmentVariable("DB_NAME") ;
-//var dbUser = Environment.GetEnvironmentVariable("DB_USER");
-//var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
-
-//var connectionString = $"Server={dbServer};Port=3306;Database={dbName};User={dbUser};Password={dbPassword};SslMode=None;";
-
-var dbServer = "bobpnzddfztu2tm8mrkt-mysql.services.clever-cloud.com";
-var dbName = "bobpnzddfztu2tm8mrkt";
-var dbUser = "uhpvcvted55itidb";
-var dbPassword = "Fuogw9qsZcyaBOXJfffm"; // replace with actual password
-
-
-
-var connectionString = $"Server={dbServer};Port=3306;Database={dbName};User={dbUser};Password={dbPassword};SslMode=None;";
-
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
-
-
-
-// Add services to the container.
-
+// Add services
 builder.Services.AddControllers();
-// In Program.cs
 builder.Services.AddScoped<IExpenseService, ExpenseServiceImpl>();
 builder.Services.AddScoped<IAuthService, AuthServiceImpl>();
 builder.Services.AddScoped<IUserDetailsService, UserDetailsServiceImpl>();
 builder.Services.AddScoped<IRecurringCategoriesService, RecurringCategoriesServiceImpl>();
 builder.Services.AddScoped<IDasboardService, DashboardServiceImpl>();
 
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-
-
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// HTTP pipeline
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -104,12 +91,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors("AllowLocalhost3000");
-
-
 app.UseAuthentication();
 app.UseAuthorization();
-
-
 app.MapControllers();
 
 app.Run();
