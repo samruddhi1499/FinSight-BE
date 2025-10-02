@@ -53,7 +53,7 @@ namespace PersonalFinancialDashboard.Services
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true,
+                Secure = false,
                 SameSite = SameSiteMode.None,
                 Expires = DateTime.UtcNow.AddHours(1),
                 Path = "/"
