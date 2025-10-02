@@ -56,7 +56,8 @@ namespace PersonalFinancialDashboard.Services
                 Secure = true,
                 SameSite = SameSiteMode.None,
                 Expires = DateTime.UtcNow.AddHours(1),
-                Path = "/"
+                Path = "/",
+                Domain = "fin-sight-fe-murex.vercel.app"
             };
 
 
