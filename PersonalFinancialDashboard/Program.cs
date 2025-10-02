@@ -26,7 +26,7 @@ var connectionString = $"Server={dbServer};Port=3306;Database={dbName};User={dbU
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
-// CORS Policy
+// CORS Policy allowing localhost:3000 with credentials enabled
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowLocalhost3000", policy =>
@@ -38,7 +38,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-// JWT Authentication
+// JWT Authentication reading token from cookie
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -70,7 +70,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// Add services
+// Register services
 builder.Services.AddControllers();
 builder.Services.AddScoped<IExpenseService, ExpenseServiceImpl>();
 builder.Services.AddScoped<IAuthService, AuthServiceImpl>();
@@ -82,7 +82,6 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-// HTTP pipeline
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -90,9 +89,13 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Enable CORS before authentication
 app.UseCors("AllowLocalhost3000");
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
 
 app.Run();
