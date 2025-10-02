@@ -37,7 +37,7 @@ namespace PersonalFinancialDashboard.Entities
         {
             modelBuilder.Entity<User>(entity =>
             {
-                entity.ToTable("User");
+                entity.ToTable("Users");
 
                 entity.Property(e => e.Id)
                       .ValueGeneratedOnAdd()

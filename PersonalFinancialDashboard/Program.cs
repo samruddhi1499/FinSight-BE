@@ -57,14 +57,25 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 
-var dbServer = Environment.GetEnvironmentVariable("DB_SERVER") ;
-var dbName = Environment.GetEnvironmentVariable("DB_NAME") ;
-var dbUser = Environment.GetEnvironmentVariable("DB_USER");
-var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
+//var dbServer = Environment.GetEnvironmentVariable("DB_SERVER") ;
+//var dbName = Environment.GetEnvironmentVariable("DB_NAME") ;
+//var dbUser = Environment.GetEnvironmentVariable("DB_USER");
+//var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
 
-var connectionString = $"Server={dbServer};Database={dbName};User Id={dbUser};Password={dbPassword};TrustServerCertificate=True;";
+//var connectionString = $"Server={dbServer};Port=3306;Database={dbName};User={dbUser};Password={dbPassword};SslMode=None;";
+
+var dbServer = "bobpnzddfztu2tm8mrkt-mysql.services.clever-cloud.com";
+var dbName = "bobpnzddfztu2tm8mrkt";
+var dbUser = "uhpvcvted55itidb";
+var dbPassword = "Fuogw9qsZcyaBOXJfffm"; // replace with actual password
+
+
+
+var connectionString = $"Server={dbServer};Port=3306;Database={dbName};User={dbUser};Password={dbPassword};SslMode=None;";
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+
 
 
 // Add services to the container.

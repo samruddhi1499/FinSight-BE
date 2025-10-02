@@ -1,4 +1,4 @@
-﻿using Azure.Core;
+﻿
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -8,7 +8,6 @@ using PersonalFinancialDashboard.DTOs;
 using PersonalFinancialDashboard.Entities;
 using PersonalFinancialDashboard.Services.Interface;
 using System.Security.Claims;
-using static Azure.Core.HttpHeader;
 
 namespace PersonalFinancialDashboard.Controllers
 {
