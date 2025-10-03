@@ -20,7 +20,7 @@ var dbUser = Environment.GetEnvironmentVariable("DB_USER");
 var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
 
 // Build MySQL connection string
-var connectionString = $"Server={dbServer};Port=3306;Database={dbName};User={dbUser};Password={dbPassword};SslMode=None;";
+var connectionString = $"Server={dbServer};Port=3306;Database={dbName};User={dbUser};Password={dbPassword};SslMode=None;AllowPublicKeyRetrieval=True;";
 
 // Add DbContext with MySQL
 builder.Services.AddDbContext<AppDbContext>(options =>
