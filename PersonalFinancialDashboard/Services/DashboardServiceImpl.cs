@@ -124,7 +124,7 @@ namespace PersonalFinancialDashboard.Services
                 .Where(e => e.UserId == userId && e.ExpenseDate.Year == now.Year)
                 .SumAsync(e => e.Amount);
 
-            var estimatedSavings = details.SalaryPerMonth - totalCapAmount;
+            var estimatedSavings = details.SalaryPerMonth - totalCap;
 
             var currentSavings = details.SalaryPerMonth - totalExpense;
 
