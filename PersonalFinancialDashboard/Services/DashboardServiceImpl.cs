@@ -63,7 +63,9 @@ namespace PersonalFinancialDashboard.Services
                                 .Where(rc => rc.UserId == userId)
                                 .SumAsync(rc => rc.CapAmount);
 
-            cardData.Add(new CardDto("Estimated Saving", totalCapAmount));
+            var savings = details.SalaryPerMonth - totalCapAmount;
+
+            cardData.Add(new CardDto("Estimated Saving", savings));
 
             var totalExpense = await _context.Expenses
                     .Where(e => e.UserId == userId && e.ExpenseDate.Year == now.Year)
@@ -79,7 +81,7 @@ namespace PersonalFinancialDashboard.Services
 
                 
 
-                var difference = totalCap - totalExpense;
+                var difference = details.SalaryPerMonth - totalExpense;
 
                 cardData.Add(new CardDto("Current Savings", details.CurrentBalance + difference));
             }
@@ -112,6 +114,8 @@ namespace PersonalFinancialDashboard.Services
         {
             DateTime now = DateTime.Now;
 
+            var details = await _context.UserDetails.SingleOrDefaultAsync(u => u.UserId == userId);
+
             var totalCap = await _context.RecurringCategories
                           .Where(rc => rc.UserId == userId)
                           .SumAsync(rc => rc.CapAmount);
@@ -120,12 +124,14 @@ namespace PersonalFinancialDashboard.Services
                 .Where(e => e.UserId == userId && e.ExpenseDate.Year == now.Year)
                 .SumAsync(e => e.Amount);
 
-            var difference = totalCap - totalExpense;
+            var estimatedSavings = details.SalaryPerMonth - totalCapAmount;
+
+            var currentSavings = details.SalaryPerMonth - totalExpense;
 
             return new MonthlyGoalDto
             {
-                Goal = totalCap,
-                Current = difference
+                Goal = estimatedSavings,
+                Current = currentSavings
             };
         }
 
