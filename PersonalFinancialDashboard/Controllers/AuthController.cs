@@ -85,8 +85,10 @@ namespace PersonalFinancialDashboard.Controllers
                    HttpOnly = true, // Important: Maintain HttpOnly flag if it was set on the original cookie
                    Secure = true, // Set to true if the original cookie was secure (HTTPS)
                    SameSite = SameSiteMode.None, // Adjust SameSite mode as needed, matching the original cookie
-                   Path = "/" // Important: Match the path of the original cookie
+                   Path = "/",
+                   Domain = ".vercel.app" // Important: Match the path of the original cookie
                               // You may also need to set the Domain property if the original cookie had one
+
                }
            );
 
