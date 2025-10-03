@@ -63,9 +63,9 @@ namespace PersonalFinancialDashboard.Services
                                 .Where(rc => rc.UserId == userId)
                                 .SumAsync(rc => rc.CapAmount);
 
-            var savings = details.SalaryPerMonth - totalCapAmount;
+            var estimatedSavings = details.SalaryPerMonth - totalCapAmount;
 
-            cardData.Add(new CardDto("Estimated Saving", savings));
+            cardData.Add(new CardDto("Estimated Saving", estimatedSavings));
 
             var totalExpense = await _context.Expenses
                     .Where(e => e.UserId == userId && e.ExpenseDate.Year == now.Year)
