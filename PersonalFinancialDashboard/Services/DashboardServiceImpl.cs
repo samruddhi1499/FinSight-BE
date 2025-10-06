@@ -63,7 +63,7 @@ namespace PersonalFinancialDashboard.Services
                                 .Where(rc => rc.UserId == userId)
                                 .SumAsync(rc => rc.CapAmount);
 
-            var estimatedSavings =var estimatedSavings = Math.Round(details.SalaryPerMonth - totalCapAmount, 2);
+            var estimatedSavings = Math.Round(details.SalaryPerMonth - totalCapAmount, 2);
 
             cardData.Add(new CardDto("Estimated Saving", estimatedSavings));
 
@@ -71,7 +71,7 @@ namespace PersonalFinancialDashboard.Services
                     .Where(e => e.UserId == userId && e.ExpenseDate.Year == now.Year)
                     .SumAsync(e => e.Amount);
 
-            cardData.Add(new CardDto("Total Spent", var estimatedSavings = Math.Round(totalExpense, 2);));
+            cardData.Add(new CardDto("Total Spent", Math.Round(totalExpense, 2)));
 
             if (!await _expenseService.CheckComplete(username)) {
 
@@ -83,7 +83,7 @@ namespace PersonalFinancialDashboard.Services
 
                 var difference = details.SalaryPerMonth - totalExpense;
 
-                cardData.Add(new CardDto("Current Savings", Math.Round(details.currentSavings + difference, 2);));
+                cardData.Add(new CardDto("Current Savings", Math.Round(details.CurrentBalance + difference, 2)));
             }
             else
                 cardData.Add(new CardDto("Current Savings", Math.Round(details.CurrentBalance, 2)));
