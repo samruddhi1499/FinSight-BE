@@ -29,7 +29,7 @@ namespace PersonalFinancialDashboard.Services
             var expense = new Expense
             {
                 ExpenseCategoriesId = request.ExpenseCategoriesId,
-                Amount = request.Amount,
+                Amount = Math.Round(request.Amount, 2),
                 ExpenseDate = request.ExpenseDate,
                 UserId = user.Id,
             };
@@ -120,7 +120,7 @@ namespace PersonalFinancialDashboard.Services
             if (expense != null)
             {
 
-                expense.Amount = amount;
+                expense.Amount = Math.Round(amount,2);
 
                 await _context.SaveChangesAsync();
 
@@ -167,7 +167,7 @@ namespace PersonalFinancialDashboard.Services
                     .Where(e => e.UserId == user.Id && e.ExpenseDate.Year == now.Year)
                     .SumAsync(e => e.Amount);
 
-                var difference = totalCap - totalExpense;
+                var difference = Math.Round(totalCap - totalExpense,2);
 
                 var userDetails = await _context.UserDetails.SingleOrDefaultAsync(u => u.UserId == user.Id);
 

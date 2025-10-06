@@ -28,8 +28,8 @@ namespace PersonalFinancialDashboard.Services
                     return (new ProfileDto ( details.SalaryPerMonth, details.CurrentBalance, details.Id, details.UserId, username, true ));
                 var userDetails = new UserDetails
                 {
-                    CurrentBalance = request.CurrentBalance,
-                    SalaryPerMonth = request.SalaryPerMonth,
+                    CurrentBalance = Math.Round(request.CurrentBalance,2),
+                    SalaryPerMonth = Math.Round(request.SalaryPerMonth,2),
                     UserId = user.Id, // Set FK directly
 
                 };
@@ -51,8 +51,8 @@ namespace PersonalFinancialDashboard.Services
             {
                 var userDetails = await _context.UserDetails.SingleOrDefaultAsync(u => u.UserId == user.Id);
 
-                userDetails.SalaryPerMonth = request.SalaryPerMonth;
-                userDetails.CurrentBalance = request.CurrentBalance;
+                userDetails.SalaryPerMonth = Math.Round(request.SalaryPerMonth,2);
+                userDetails.CurrentBalance = Math.Round(request.CurrentBalance,2);
 
 
                 await _context.SaveChangesAsync();

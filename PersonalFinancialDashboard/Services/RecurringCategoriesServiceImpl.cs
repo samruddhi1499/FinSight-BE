@@ -32,7 +32,7 @@ namespace PersonalFinancialDashboard.Services
             {
                 ExpenseCategoriesId = expenseCategory.Id,
                 UserId = user.Id,
-                CapAmount = request.CapAmount,
+                CapAmount = Math.Round(request.CapAmount,2),
                 User = user,
                 ExpenseCategories = expenseCategory
             };
@@ -60,7 +60,7 @@ namespace PersonalFinancialDashboard.Services
             if (recurringCategory == null)
                 return new RecurringCatMessageDto("Recurring category not found", false);
 
-            recurringCategory.CapAmount = request.CapAmount;
+            recurringCategory.CapAmount = Math.Round(request.CapAmount, 2);
             await _context.SaveChangesAsync();
 
             return new RecurringCatMessageDto("Updated", true);

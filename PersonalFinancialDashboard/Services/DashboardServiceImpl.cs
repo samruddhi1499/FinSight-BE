@@ -63,7 +63,7 @@ namespace PersonalFinancialDashboard.Services
                                 .Where(rc => rc.UserId == userId)
                                 .SumAsync(rc => rc.CapAmount);
 
-            var estimatedSavings = details.SalaryPerMonth - totalCapAmount;
+            var estimatedSavings =var estimatedSavings = Math.Round(details.SalaryPerMonth - totalCapAmount, 2);
 
             cardData.Add(new CardDto("Estimated Saving", estimatedSavings));
 
@@ -71,7 +71,7 @@ namespace PersonalFinancialDashboard.Services
                     .Where(e => e.UserId == userId && e.ExpenseDate.Year == now.Year)
                     .SumAsync(e => e.Amount);
 
-            cardData.Add(new CardDto("Total Spent", totalExpense));
+            cardData.Add(new CardDto("Total Spent", var estimatedSavings = Math.Round(totalExpense, 2);));
 
             if (!await _expenseService.CheckComplete(username)) {
 
@@ -83,10 +83,10 @@ namespace PersonalFinancialDashboard.Services
 
                 var difference = details.SalaryPerMonth - totalExpense;
 
-                cardData.Add(new CardDto("Current Savings", details.CurrentBalance + difference));
+                cardData.Add(new CardDto("Current Savings", Math.Round(details.currentSavings + difference, 2);));
             }
             else
-                cardData.Add(new CardDto("Current Savings", details.CurrentBalance));
+                cardData.Add(new CardDto("Current Savings", Math.Round(details.CurrentBalance, 2)));
 
             return cardData;
 
@@ -124,9 +124,9 @@ namespace PersonalFinancialDashboard.Services
                 .Where(e => e.UserId == userId && e.ExpenseDate.Year == now.Year)
                 .SumAsync(e => e.Amount);
 
-            var estimatedSavings = details.SalaryPerMonth - totalCap;
+            var estimatedSavings = Math.Round(details.SalaryPerMonth - totalCap, 2); 
 
-            var currentSavings = details.SalaryPerMonth - totalExpense;
+            var currentSavings = Math.Round(details.SalaryPerMonth - totalExpense, 2);
 
             return new MonthlyGoalDto
             {
