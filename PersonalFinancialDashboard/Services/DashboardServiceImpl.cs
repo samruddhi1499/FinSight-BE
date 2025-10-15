@@ -83,10 +83,10 @@ namespace PersonalFinancialDashboard.Services
 
                 var difference = details.SalaryPerMonth - totalExpense;
 
-                cardData.Add(new CardDto("Current Savings", Math.Round(details.CurrentBalance + difference, 2)));
+                cardData.Add(new CardDto("Current Savings", Math.Round(difference, 2)));
             }
             else
-                cardData.Add(new CardDto("Current Savings", Math.Round(details.CurrentBalance, 2)));
+                cardData.Add(new CardDto("Current Savings", 0.00));
 
             return cardData;
 
@@ -116,22 +116,23 @@ namespace PersonalFinancialDashboard.Services
 
             var details = await _context.UserDetails.SingleOrDefaultAsync(u => u.UserId == userId);
 
-            var totalCap = await _context.RecurringCategories
+            var estimatedSpending = Math.Round(await _context.RecurringCategories
                           .Where(rc => rc.UserId == userId)
-                          .SumAsync(rc => rc.CapAmount);
+                          .SumAsync(rc => rc.CapAmount),2);
 
-            var totalExpense = await _context.Expenses
+            var currentExpense = Math.Round(await _context.Expenses
                 .Where(e => e.UserId == userId && e.ExpenseDate.Year == now.Year)
-                .SumAsync(e => e.Amount);
+                .SumAsync(e => e.Amount), 2);
 
-            var estimatedSavings = Math.Round(details.SalaryPerMonth - totalCap, 2); 
+            var currentSavings = Math.Round(details.SalaryPerMonth - currentExpense, 2);
 
-            var currentSavings = Math.Round(details.SalaryPerMonth - totalExpense, 2);
+            
 
             return new MonthlyGoalDto
             {
-                Goal = estimatedSavings,
-                Current = currentSavings
+                Goal = estimatedSpending,
+                Current = currentExpense,
+                CurrentSavings = currentSavings
             };
         }
 
