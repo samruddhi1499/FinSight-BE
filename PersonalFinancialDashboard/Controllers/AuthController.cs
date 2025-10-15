@@ -82,7 +82,7 @@ namespace PersonalFinancialDashboard.Controllers
                new CookieOptions()
                {
                    Expires = DateTimeOffset.UtcNow.AddDays(-1), // Set an expired date in the past
-                   HttpOnly = true, // Important: Maintain HttpOnly flag if it was set on the original cookie
+                   HttpOnly = true, // Important: Maintain HttpOnly fg if it was set on the original cookie
                    Secure = true, // Set to true if the original cookie was secure (HTTPS)
                    SameSite = SameSiteMode.None, // Adjust SameSite mode as needed, matching the original cookie
                    Path = "/" // Important: Match the path of the original cookie
