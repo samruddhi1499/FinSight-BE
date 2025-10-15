@@ -131,7 +131,7 @@ namespace PersonalFinancialDashboard.Services
             return new MonthlyGoalDto
             {
                 Goal = Math.Round(estimatedSpending, 2),
-                Current = Math.Round(currentExpense,2)
+                Current = Math.Round(currentExpense,2),
                 CurrentSavings = Math.Round(currentSavings,2)
             };
         }
