@@ -116,23 +116,23 @@ namespace PersonalFinancialDashboard.Services
 
             var details = await _context.UserDetails.SingleOrDefaultAsync(u => u.UserId == userId);
 
-            var estimatedSpending = Math.Round(await _context.RecurringCategories
+            var estimatedSpending = await _context.RecurringCategories
                           .Where(rc => rc.UserId == userId)
-                          .SumAsync(rc => rc.CapAmount),2);
+                          .SumAsync(rc => rc.CapAmount);
 
-            var currentExpense = Math.Round(await _context.Expenses
+            var currentExpense = await _context.Expenses
                 .Where(e => e.UserId == userId && e.ExpenseDate.Year == now.Year)
-                .SumAsync(e => e.Amount), 2);
+                .SumAsync(e => e.Amount);
 
-            var currentSavings = Math.Round(details.SalaryPerMonth - currentExpense, 2);
+            var currentSavings = details.SalaryPerMonth - currentExpense;
 
             
 
             return new MonthlyGoalDto
             {
-                Goal = estimatedSpending,
-                Current = currentExpense,
-                CurrentSavings = currentSavings
+                Goal = Math.Round(estimatedSpending, 2),
+                Current = Math.Round(currentExpense,2)
+                CurrentSavings = Math.Round(currentSavings,2)
             };
         }
 
